@@ -6,12 +6,18 @@ import './App.css';
 import Navigator from './components/Navigator';
 import Question from './components/Question';
 import NavigationButtons from "./components/NavigationButtons";
+import GoogleLogin from 'react-google-login';
+
+const responseGoogle = (response) => {
+	console.log(response);
+}
 
 class App extends Component {
 	constructor() {
 		super();
 		this.state = {
-			currentQuestion : 1
+			currentQuestion : 1,
+			login : false
 		};
 		this.navigationHandler = this.navigationHandler.bind(this);
 		this.answerHandler = this.answerHandler.bind(this);
@@ -75,7 +81,19 @@ class App extends Component {
     }
 
 	render() {
-		if(
+		if( login!=true ) {
+			ReactDOM.render(
+				<GoogleLogin
+					clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com"
+					buttonText="Login"
+					onSuccess={ responseGoogle }
+					onFailure={ responseGoogle }
+					cookiePolicy={ 'single_host_origin' }
+				/>,
+				document.getElementById('googleButton')
+			);
+		}
+		else if(
 			this.state.questions && 
 			this.state.count &&
 			this.state.answers
