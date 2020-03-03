@@ -1,6 +1,7 @@
 // src.App.js
 
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import './App.css';
 
 import Navigator from './components/Navigator';
@@ -81,16 +82,15 @@ class App extends Component {
     }
 
 	render() {
-		if( login!=true ) {
-			ReactDOM.render(
+		if( this.state.login!=true ) {
+			return(
 				<GoogleLogin
 					clientId="946929890145-lhvm7kg3c5gc1mb7i5hhmj3j407s3kb4.apps.googleusercontent.com"
 					buttonText="Login"
 					onSuccess={ responseGoogle }
 					onFailure={ responseGoogle }
 					cookiePolicy={ 'single_host_origin' }
-				/>,
-				document.getElementById('googleButton')
+				/>
 			);
 		}
 		else if(
