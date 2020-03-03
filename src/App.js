@@ -84,7 +84,7 @@ class App extends Component {
 		if( login!=true ) {
 			ReactDOM.render(
 				<GoogleLogin
-					clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com"
+					clientId="946929890145-lhvm7kg3c5gc1mb7i5hhmj3j407s3kb4.apps.googleusercontent.com"
 					buttonText="Login"
 					onSuccess={ responseGoogle }
 					onFailure={ responseGoogle }
