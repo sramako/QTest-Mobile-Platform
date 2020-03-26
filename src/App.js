@@ -25,7 +25,7 @@ class App extends Component {
 		this.state = {
 			currentQuestion : 1,
 			login : false,
-			page : "login"
+			page : "applogin"
 		};
 		this.navigationHandler = this.navigationHandler.bind(this);
 		this.answerHandler = this.answerHandler.bind(this);
@@ -122,7 +122,6 @@ class App extends Component {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				email: this.state.profile["email"]
-				// email: "sramakoo@gmail.com"
 			})
 		}
 		console.log("API CALL"+this.state)
@@ -133,7 +132,7 @@ class App extends Component {
 			this.setState({ tests });
 			console.log("XHR:"+data);
 			console.log("NOTIFY")
-			this.notify('Tests Loaded')
+			this.notify('Loading Dashboard!')
 		})
 		.catch(console.log)
 	}
@@ -148,29 +147,35 @@ class App extends Component {
 				password: password
 			})
 		}
-		console.log("Internal Login")
-		fetch(urlConfig.url+'authentication', requestOptions)
-		.then(res => res.json())
-		.then((data) => {
-			var tests = data;
-			if(data["state"]!="error") {
-				this.setState({
-					login	:	true,
-					profile	:	{
-						"googleId": data["googleId"],
-						"imageUrl": data["imageUrl"],
-						"email": data["email"],
-						"name": data["name"],
-						"givenName": data["givenName"],
-						"familyName": data["familyName"]
-					},
-					page	:	"tests"
-				})
-			}
-			this.notify('Tests Loaded')
-		})
-		.catch(console.log)
-		return false
+		if( username && password ) {
+			console.log("Internal Login")
+			fetch(urlConfig.url+'authenticate', requestOptions)
+			.then(res => res.json())
+			.then((data) => {
+				var tests = data;
+				if(data["state"]!="error") {
+					this.setState({
+						login	:	true,
+						profile	:	{
+							"googleId": data["googleId"],
+							"imageUrl": data["imageUrl"],
+							"email": data["email"],
+							"name": data["name"],
+							"givenName": data["givenName"],
+							"familyName": data["familyName"]
+						},
+						page	:	"tests"
+					})
+				}
+				this.notify('Signed in. Loading App!')
+				return true
+			}).catch(console.log)
+
+			return "error"
+		}
+		else {
+			return false
+		}
 	}
 
 	trySignup( username, password ) {
@@ -190,7 +195,7 @@ class App extends Component {
 			})
 		}
 		console.log("Signup")
-		fetch(urlConfig.url+'authentication', requestOptions)
+		fetch(urlConfig.url+'authenticate', requestOptions)
 		.then(res => res.json())
 		.then((data) => {
 			var tests = data;
@@ -282,29 +287,6 @@ class App extends Component {
 			this.state.page==="login"
 		) {
 			//#region autologin
-			var username = Cookies.get('username')
-			var password = Cookies.get('password')
-			var result = this.tryLogin(username, password)
-			if(result == false) {
-				return(
-					
-					<div>
-						<div>Wrong credentials or account does not exist!</div>
-						<GoogleLogin
-							clientId={ urlConfig.client_id }
-							buttonText="Sign Up with Google"
-							onSuccess={ this.responseGoogleSuccess }
-							onFailure={ this.responseGoogleFailure }
-							cookiePolicy={ 'single_host_origin' }
-						/>
-						<div>
-							Username : { Cookies.get('username') }
-							Password : { Cookies.get('password') }
-						</div>
-				</div>
-				)
-			}
-
 			// this.setState({
 			// 	login	:	true,
 			// 	profile	:	{
@@ -319,20 +301,71 @@ class App extends Component {
 			// })
 			//#endregion
 			return(
-				<div>
-					<GoogleLogin
-						clientId={ urlConfig.client_id }
-						buttonText="Sign Up with Google"
-						onSuccess={ this.responseGoogleSuccess }
-						onFailure={ this.responseGoogleFailure }
-						cookiePolicy={ 'single_host_origin' }
-					/>
-					<div>
-						Username : { Cookies.get('username') }
-						Password : { Cookies.get('password') }
+				<div style={{ position:"relative", height:"100%" }}>
+					<div style={{ textAlign:"center", marginTop:"100%" }}>
+						<GoogleLogin
+							clientId={ urlConfig.client_id }
+							buttonText="Sign Up with Google"
+							onSuccess={ this.responseGoogleSuccess }
+							onFailure={ this.responseGoogleFailure }
+							cookiePolicy={ 'single_host_origin' }
+						/>
+						<ToastContainer />
 					</div>
 				</div>
 			);
+		}
+
+		// APP LOGIN
+		else if (
+			this.state.login!==true &&
+			this.state.page==="applogin"
+		)
+		{
+			var username = Cookies.get('username')
+			var password = Cookies.get('password')
+			if(username && password) {
+				var result = this.tryLogin(username, password)
+				console.log(result)
+				if(result == false) {
+					this.notify("You are not logged in!")
+					return(					
+						<div>
+							<div>Wrong credentials or account does not exist!</div>
+							<ToastContainer />
+							<div>
+								Username : { Cookies.get('username') }
+							</div>
+							<div>
+								Password : { Cookies.get('password') }
+							</div>
+					</div>
+					)
+				}
+				if(result == "error") {
+					this.notify("Something Went Wrong!")
+					return(					
+						<div>
+							<div>Wrong credentials or account does not exist!</div>
+							<ToastContainer />
+							<div>
+								Username : { Cookies.get('username') }
+							</div>
+							<div>
+								Password : { Cookies.get('password') }
+							</div>
+					</div>
+					)
+				}
+			}
+			this.setState({
+				page : "error",
+				page : "login"
+			})
+			return(
+				<div>Redirecting to Sign Up Page!</div>
+			)
+
 		}
 
 		// SIGN UP
@@ -360,6 +393,7 @@ class App extends Component {
 					<button onClick={ this.trySignup(this.state.profile["email"], password) }>
 						SignUp
 					</button>
+					<ToastContainer />
 				</div>
 			);
 		}		

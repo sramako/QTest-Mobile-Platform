@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^7.2.1",
     "bootstrap": "^4.4.1",
     "glamor": "^2.20.40",
+    "js-cookie": "^2.2.1",
     "json-server": "^0.16.1",
     "jsonserver": "^0.1.6",
     "react": "^16.13.0",
