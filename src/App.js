@@ -218,18 +218,18 @@ class App extends Component {
 			this.state.page==="login"
 		) {
 			//#region autologin
-			this.setState({
-				login	:	true,
-				profile	:	{
-					"googleId": "101871717918121156189",
-					"imageUrl": "assets/avatar.jpg",
-					"email": "sramakoo@gmail.com",
-					"name": "Sram Ako",
-					"givenName": "Sram",
-					"familyName": "Ako"
-				},
-				page	:	"tests"
-			})
+			// this.setState({
+			// 	login	:	true,
+			// 	profile	:	{
+			// 		"googleId": "101871717918121156189",
+			// 		"imageUrl": "assets/avatar.jpg",
+			// 		"email": "sramakoo@gmail.com",
+			// 		"name": "Sram Ako",
+			// 		"givenName": "Sram",
+			// 		"familyName": "Ako"
+			// 	},
+			// 	page	:	"tests"
+			// })
 			//#endregion
 			return(
 				<div>
