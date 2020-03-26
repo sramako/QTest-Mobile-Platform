@@ -6,12 +6,21 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.1",
     "@testing-library/user-event": "^7.2.1",
+    "bootstrap": "^4.4.1",
+    "glamor": "^2.20.40",
     "json-server": "^0.16.1",
     "jsonserver": "^0.1.6",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-google-login": "^5.1.1",
-    "react-scripts": "3.4.0"
+    "react-loader-spinner": "^3.1.5",
+    "react-notifications": "^1.5.0",
+    "react-responsive": "^8.0.3",
+    "react-responsive-navbar": "^1.0.11",
+    "react-scripts": "3.4.0",
+    "react-toastify": "^5.5.0",
+    "react-window-size": "^1.2.2",
+    "reactstrap": "^8.4.1"
   },
   "scripts": {
     "start": "react-scripts start",

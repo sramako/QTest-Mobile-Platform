@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from 'react-dom';
+import './question.css';
 
 class Question extends React.Component
 {
@@ -47,7 +47,6 @@ class Question extends React.Component
 
     resolveSelection(id) {
         if( this.state.selected == id) {
-            console.log(id+"selected")
             return "selected"
         }
         else {
@@ -63,14 +62,14 @@ class Question extends React.Component
         ) {
             return(
                 <div id="question-container">
-                    <div>{ this.state.question }</div>
+                    <div className='card card-1'>{ this.state.question }</div>
                     {this.state.answers.map(answer => {
                         return(
                             <p
                                 id = { answer.id }
                                 key = { answer.id }
                                 onClick = { this.selectAnswer }
-                                className = { this.resolveSelection(answer.id) }
+                                className = { this.resolveSelection(answer.id)+' subcard' }
                             >
                                 { answer.value }
                             </p>

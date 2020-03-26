@@ -1,0 +1,40 @@
+.navigationButtons {
+    position: fixed;
+    width: 97%;
+    bottom: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 5px
+}
+
+.navigationButton {
+    text-decoration: none;
+    display: inline-block;
+    padding: 8px 16px;
+}
+
+.navigationButton:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+#previous {
+    background-color: #f1f1f1;
+    color: black;
+    left: 0;
+    width: 50%;
+    text-align: center;
+}
+
+#next {
+    background-color: #f1f1f1;
+    color: black;
+    position: absolute;
+    right: 0;
+    width: 49%;
+    text-align: center;
+}
+
+.round {
+    border-radius: 50%;
+}

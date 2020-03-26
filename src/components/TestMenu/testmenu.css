@@ -1,0 +1,66 @@
+.test{
+  color : white;
+  font-size: 20px;
+}
+
+.group{
+  color : rgb(224, 224, 224);
+  text-align: right;
+  font-size: 10px;
+}
+
+.row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.card {
+  background-color: #fff;
+  padding: 20px;
+  border: none;
+  border-radius: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.12);
+}
+
+.box {
+  padding: 20px 20px 10px 20px;
+}
+
+.gradient-box {
+  width: 95%;
+  height: 100px;
+  padding-bottom: 20px;
+  padding-top: 20px;
+  border-radius: 2%;
+  margin: 5px auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-bottom: 10px;
+}
+
+.gradient-love { background: linear-gradient(45deg, #F2709C 0%, #FF9473 100%); }
+.gradient-jungle { background: linear-gradient(45deg, #92D000 0%, #7AC493 100%); }
+.gradient-night { background: linear-gradient(45deg, #52A7EA 0%, #712E98 100%); }
+.gradient-sea { background: linear-gradient(45deg, #6E7BFB 0%, #9CFCF8 100%); }
+.gradient-sunshine { background: linear-gradient(45deg, #FF9B30 0%, #F8FF3F 100%); }
+.gradient-sunset { background: linear-gradient(45deg, #F58573 0%, #5F79F4 100%); }
+
+.gradient-colors {
+  font-size: 0.85em;
+  padding: 10px 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.gradient-love-color1 { color: #F2709C}
+.gradient-love-color2 { color: #FF9473}
+.gradient-jungle-color1 { color: #92D000}
+.gradient-jungle-color2 { color: #7AC493}
+.gradient-night-color1 { color: #52A7EA}
+.gradient-night-color2 { color: #712E98}
+.gradient-sea-color1 { color: #6E7BFB}
+.gradient-sea-color2 { color: #9CFCF8}
+.gradient-sunshine-color1 { color: #FF9B30}
+.gradient-sunshine-color2 { color: #F8FF3F}
+.gradient-sunset-color1 { color: #F58573}
+.gradient-sunset-color2 { color: #5F79F4}

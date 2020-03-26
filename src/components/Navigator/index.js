@@ -1,7 +1,5 @@
 import React from "react";
-import ReactDOM from 'react-dom';
-import Question from "../Question";
-
+import './navigator.css';
 class Navigator extends React.Component
 {
     constructor(props) {
@@ -44,9 +42,9 @@ class Navigator extends React.Component
 
     resolveButtonState(question) {
         if( question == this.state.currentQuestion) {
-            return "active"
+            return "current"
         }
-        else if ( this.state.answers[question - 1] != -1 ) {
+        else if ( this.state.answers[question - 1] !== '-1' ) {
             return "dirty"
         }
         else {
@@ -60,14 +58,14 @@ class Navigator extends React.Component
             <div className="navigator">
                 {this.state.questions.map(question => {
                     return(
-                        <span key={ question }>
-                            <button 
+                        <span key={ question } className="navigator-layout">
+                            <span
                                 id = { question }
-                                className = { this.resolveButtonState(question) }
+                                className = { "navb "+this.resolveButtonState(question) }
                                 onClick = { this.changeQuestion }
                             >
                                 { question }
-                            </button>
+                            </span>
                         </span>
                     )}
                 )}

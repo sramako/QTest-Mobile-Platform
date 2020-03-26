@@ -1,56 +1,186 @@
 // src.App.js
 
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+import GoogleLogin from 'react-google-login';
 import './App.css';
+import { urlConfig } from './conf.js';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import Navigator from './components/Navigator';
 import Question from './components/Question';
 import NavigationButtons from "./components/NavigationButtons";
-import GoogleLogin from 'react-google-login';
-
-const responseGoogle = (response) => {
-	console.log(response);
-}
+import Logout from "./components/Logout";
+import NavBar from "./components/NavBar";
+import Tests from "./components/TestMenu";
+import Notifications from "./components/Notifications";
+import LoaderPage from "./components/Loader";
+import { css } from 'glamor';
 
 class App extends Component {
 	constructor() {
 		super();
 		this.state = {
 			currentQuestion : 1,
-			login : false
+			login : false,
+			page : "login"
 		};
 		this.navigationHandler = this.navigationHandler.bind(this);
 		this.answerHandler = this.answerHandler.bind(this);
 		this.previousQuestion = this.previousQuestion.bind(this);
-        this.nextQuestion = this.nextQuestion.bind(this);
+		this.nextQuestion = this.nextQuestion.bind(this);
+		this.loadTests = this.loadTests.bind(this);
+		this.loadTest = this.loadTest.bind(this);
+		this.selectTest = this.selectTest.bind(this);
 	}
 
-	componentWillMount() {
-		fetch('http://localhost:5000/metadata')
+	//#region Authentication
+	responseGoogleSuccess = (response) => {
+		console.log(response);
+		this.setState({
+			profile : response.profileObj,
+			login : true,
+			page : "tests",
+		});
+		// this.loadTests();
+	}
+
+	responseGoogleFailure = (response) => {
+		console.log("ERROR");
+		console.log(response);
+	}
+	//#endregion
+
+	componentDidMount() {
+		this.interval = setInterval(() => this.syncAPI(), 60000);
+	}
+
+	notify = (message) => toast(
+        message,
+        {
+			position: toast.POSITION.BOTTOM_LEFT,
+			draggablePercent: 60,
+			autoClose: 1500,
+			className: css({
+				background: 'black'
+			})
+        }
+	);
+	
+	//#region Data API Calls
+	selectTest(test, group) {
+		this.setState({
+			test	:	test,
+			group	:	group,
+			page	:	"test"
+		})
+		console.log("trying to set test, group")
+	}
+
+	loadTest(test, group) {
+		// args: email, group, test
+		var requestOptions = {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				email: this.state.profile["email"],
+				group: this.state.group,
+				test: this.state.test
+			})
+		}
+		console.log(this.state.test)
+		fetch(urlConfig.url+'metadata', requestOptions)
 		.then(res => res.json())
 		.then((data) => {
-			var count = parseInt(data.size);
-			this.setState({ count });
-			console.log("XHR:"+data);
-		})
-		.catch(console.log)
 
-		fetch('http://localhost:5000/questions')
-		.then(res => res.json())
-		.then((questions) => {
-			this.setState({ questions })
-			var answers = new Array(questions.length);
-			for(var i = 0; i < questions.length; i++) {
+			// metadata
+			var count = parseInt(data.metadata);
+			this.setState({ count });
+			var answers = new Array(count);
+			for(var i = 0; i < count; i++) {
 				answers[i] = -1;
 			}
 			this.setState({ answers });
-			console.log("XHR:"+JSON.stringify(questions));
+
+			// questions
+			this.setState({ questions : data.questions })
+			console.log("XHR:"+JSON.stringify(this.questions));
+			this.notify('Loading Test')
+
 		})
 		.catch(console.log)
 
+		this.syncAPI();
 	}
 
+	loadTests( ) {
+		// args: email
+		const requestOptions = {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				email: this.state.profile["email"]
+				// email: "sramakoo@gmail.com"
+			})
+		}
+		console.log("API CALL"+this.state)
+		fetch(urlConfig.url+'tests', requestOptions)
+		.then(res => res.json())
+		.then((data) => {
+			var tests = data;
+			this.setState({ tests });
+			console.log("XHR:"+data);
+			console.log("NOTIFY")
+			this.notify('Tests Loaded')
+		})
+		.catch(console.log)
+	}
+
+	syncAPI() {
+		if (
+			this.state.questions && 
+			this.state.count &&
+			this.state.answers &&
+			this.state.profile &&
+			this.state.page === "test"
+		)
+		{
+			console.log("SYNCAPI")
+			var requestOptions = {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					email: this.state.profile["email"],
+					group: this.state.group,
+					test: this.state.test,
+					answer: this.state.answers
+				})
+			}
+			console.log(requestOptions)
+			fetch(urlConfig.url+'status', requestOptions)
+			.then(res => res.text())
+			.then((data) => {
+				var s = JSON.stringify(data);
+				var s = JSON.parse(data)
+
+				// updated answer
+				// TODO: Answer Sanity Check
+				this.setState({ answers : s["ANSWER"] })
+
+				// climax
+				this.setState({ climax : s.CLIMAX })
+
+				this.notify('Syncing with Server')
+
+				this.setState({ sync : true })
+			})
+			.catch(console.log)
+		}
+	}
+	//#endregion
+
+	//#region Navigation
 	navigationHandler(currentQuestion) {
 		this.setState({ currentQuestion : currentQuestion });
 	}
@@ -73,33 +203,82 @@ class App extends Component {
 
     previousQuestion() {
         var currentQuestion = parseInt( this.state.currentQuestion );
-        var count = parseInt( this.state.count );
         if(currentQuestion > 1) {
             currentQuestion = currentQuestion - 1;
             currentQuestion = currentQuestion.toString();
             this.setState({ currentQuestion });
         }
-    }
+	}
+	//#endregion
 
 	render() {
-		if( this.state.login!=true ) {
+		// LOGIN
+		if(
+			this.state.login!==true &&
+			this.state.page==="login"
+		) {
+			//#region autologin
+			this.setState({
+				login	:	true,
+				profile	:	{
+					"googleId": "101871717918121156189",
+					"imageUrl": "assets/avatar.jpg",
+					"email": "sramakoo@gmail.com",
+					"name": "Sram Ako",
+					"givenName": "Sram",
+					"familyName": "Ako"
+				},
+				page	:	"tests"
+			})
+			//#endregion
 			return(
-				<GoogleLogin
-					clientId="946929890145-lhvm7kg3c5gc1mb7i5hhmj3j407s3kb4.apps.googleusercontent.com"
-					buttonText="Login"
-					onSuccess={ responseGoogle }
-					onFailure={ responseGoogle }
-					cookiePolicy={ 'single_host_origin' }
-				/>
+				<div>
+					<GoogleLogin
+						clientId={ urlConfig.client_id }
+						buttonText="Login"
+						onSuccess={ this.responseGoogleSuccess }
+						onFailure={ this.responseGoogleFailure }
+						cookiePolicy={ 'single_host_origin' }
+					/>
+				</div>
 			);
 		}
+
+		// TEST MENU
+		else if(
+			this.state.profile &&
+			this.state.tests &&
+			this.state.page === "tests"
+		) {
+			return(
+				<div>
+					<NavBar
+						profile={ this.state.profile }
+					>
+					</NavBar>
+					<Tests 
+						tests={ this.state.tests }
+						loadTest={ this.selectTest }
+					/>
+					<ToastContainer />
+				</div>
+			);
+		}
+
+		// TEST
 		else if(
 			this.state.questions && 
 			this.state.count &&
-			this.state.answers
+			this.state.answers &&
+			this.state.profile &&
+			this.state.page === "test" &&
+			this.state.sync
 		) {
 			return (
 				<div>
+					<NavBar
+						profile={ this.state.profile }
+					/>
 					<Navigator
 						count={ this.state.count }
 						handler={ this.navigationHandler }
@@ -120,12 +299,21 @@ class App extends Component {
 						currentQuestion={ this.state.currentQuestion }
 						key = { this.state.currentQuestion }
 					/>
+					<ToastContainer />
 				</div>
 			);
 		}
+
+		// BUFFER
 		else {
+			if(this.state.page=="tests") {
+				this.loadTests();
+			}
+			if(this.state.page=="test") {
+				this.loadTest(this.state.test, this.state.group)
+			}
 			return (
-				<p>Loading...</p>
+				<LoaderPage />
 			)
 		}
 	}
