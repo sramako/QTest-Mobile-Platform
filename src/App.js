@@ -17,6 +17,7 @@ import Tests from "./components/TestMenu";
 import Notifications from "./components/Notifications";
 import LoaderPage from "./components/Loader";
 import { css } from 'glamor';
+import Cookies from 'js-cookie';
 
 class App extends Component {
 	constructor() {
@@ -240,6 +241,10 @@ class App extends Component {
 						onFailure={ this.responseGoogleFailure }
 						cookiePolicy={ 'single_host_origin' }
 					/>
+					<div>
+						Username : { Cookies.get('username') }
+						Password : { Cookies.get('password') }
+					</div>
 				</div>
 			);
 		}
