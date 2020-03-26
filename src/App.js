@@ -42,7 +42,7 @@ class App extends Component {
 		this.setState({
 			profile : response.profileObj,
 			login : true,
-			page : "tests",
+			page : "signup",
 		});
 		// this.loadTests();
 	}
@@ -138,6 +138,69 @@ class App extends Component {
 		.catch(console.log)
 	}
 
+	tryLogin( username, password ) {
+		// args: email
+		const requestOptions = {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				email: username,
+				password: password
+			})
+		}
+		console.log("Internal Login")
+		fetch(urlConfig.url+'authentication', requestOptions)
+		.then(res => res.json())
+		.then((data) => {
+			var tests = data;
+			if(data["state"]!="error") {
+				this.setState({
+					login	:	true,
+					profile	:	{
+						"googleId": data["googleId"],
+						"imageUrl": data["imageUrl"],
+						"email": data["email"],
+						"name": data["name"],
+						"givenName": data["givenName"],
+						"familyName": data["familyName"]
+					},
+					page	:	"tests"
+				})
+			}
+			this.notify('Tests Loaded')
+		})
+		.catch(console.log)
+		return false
+	}
+
+	trySignup( username, password ) {
+		// args: email
+		const requestOptions = {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				email		: username,
+				password	: password,
+				googleId	: this.state.profile["googleId"],
+				imageUrl	: this.state.profile["imageUrl"],
+				email		: this.state.profile["email"],
+				name		: this.state.profile["name"],
+				givenName	: this.state.profile["givenName"],
+				familyName	: this.state.profile["familyName"]
+			})
+		}
+		console.log("Signup")
+		fetch(urlConfig.url+'authentication', requestOptions)
+		.then(res => res.json())
+		.then((data) => {
+			var tests = data;
+			if(data["state"]!="error") {
+				this.notify('Signed Up')
+			}		
+		})
+		.catch(console.log)
+	}
+
 	syncAPI() {
 		if (
 			this.state.questions && 
@@ -219,6 +282,29 @@ class App extends Component {
 			this.state.page==="login"
 		) {
 			//#region autologin
+			var username = Cookies.get('username')
+			var password = Cookies.get('password')
+			var result = this.tryLogin(username, password)
+			if(result == false) {
+				return(
+					
+					<div>
+						<div>Wrong credentials or account does not exist!</div>
+						<GoogleLogin
+							clientId={ urlConfig.client_id }
+							buttonText="Sign Up with Google"
+							onSuccess={ this.responseGoogleSuccess }
+							onFailure={ this.responseGoogleFailure }
+							cookiePolicy={ 'single_host_origin' }
+						/>
+						<div>
+							Username : { Cookies.get('username') }
+							Password : { Cookies.get('password') }
+						</div>
+				</div>
+				)
+			}
+
 			// this.setState({
 			// 	login	:	true,
 			// 	profile	:	{
@@ -236,7 +322,7 @@ class App extends Component {
 				<div>
 					<GoogleLogin
 						clientId={ urlConfig.client_id }
-						buttonText="Login"
+						buttonText="Sign Up with Google"
 						onSuccess={ this.responseGoogleSuccess }
 						onFailure={ this.responseGoogleFailure }
 						cookiePolicy={ 'single_host_origin' }
@@ -248,6 +334,35 @@ class App extends Component {
 				</div>
 			);
 		}
+
+		// SIGN UP
+		else if(
+			this.state.profile &&
+			this.state.page === "signup"
+		)
+		{
+			var username;
+			var password;
+			// function setUser(s) {
+			// 	username = s
+			// }
+			function setPass(s) {
+				password = s
+			}
+			return(
+				<div>
+					{/* <div>
+						Email : <input onChange={event => setUser(event.target.value)} />
+					</div> */}
+					<div>
+						Password : <input onChange={event => setPass(event.target.value)} />
+					</div>
+					<button onClick={ this.trySignup(this.state.profile["email"], password) }>
+						SignUp
+					</button>
+				</div>
+			);
+		}		
 
 		// TEST MENU
 		else if(
